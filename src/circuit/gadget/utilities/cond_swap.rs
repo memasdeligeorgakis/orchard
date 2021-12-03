@@ -1,7 +1,7 @@
 use super::{bool_check, ternary, UtilitiesInstructions};
 use halo2::{
     circuit::{AssignedCell, Chip, Layouter},
-    plonk::{Advice, Column, ConstraintSystem, Error, Selector},
+    plonk::{Advice, Column, ConstraintSystem, Constraints, Error, Selector},
     poly::Rotation,
 };
 use pasta_curves::arithmetic::FieldExt;
@@ -178,8 +178,7 @@ impl<F: FieldExt> CondSwapChip<F> {
             // Check `swap` is boolean.
             let bool_check = bool_check(swap);
 
-            array::IntoIter::new([a_check, b_check, bool_check])
-                .map(move |poly| q_swap.clone() * poly)
+            Constraints::with_selector(q_swap, array::IntoIter::new([a_check, b_check, bool_check]))
         });
 
         config

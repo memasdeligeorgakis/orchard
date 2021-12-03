@@ -3,7 +3,7 @@
 use group::{Curve, GroupEncoding};
 use halo2::{
     circuit::{floor_planner, AssignedCell, Layouter},
-    plonk::{self, Advice, Column, Expression, Instance as InstanceColumn, Selector},
+    plonk::{self, Advice, Column, Constraints, Expression, Instance as InstanceColumn, Selector},
     poly::Rotation,
     transcript::{Blake2bRead, Blake2bWrite},
 };
@@ -159,22 +159,24 @@ impl plonk::Circuit<pallas::Base> for Circuit {
             let not_enable_spends = one.clone() - meta.query_advice(advices[6], Rotation::cur());
             let not_enable_outputs = one - meta.query_advice(advices[7], Rotation::cur());
 
-            std::array::IntoIter::new([
-                (
-                    "v_old - v_new = magnitude * sign",
-                    v_old.clone() - v_new.clone() - magnitude * sign,
-                ),
-                (
-                    "Either v_old = 0, or anchor equals public input",
-                    v_old.clone() * (anchor - pub_input_anchor),
-                ),
-                ("v_old = 0 or enable_spends = 1", v_old * not_enable_spends),
-                (
-                    "v_new = 0 or enable_outputs = 1",
-                    v_new * not_enable_outputs,
-                ),
-            ])
-            .map(move |(name, poly)| (name, q_orchard.clone() * poly))
+            Constraints::with_selector(
+                q_orchard,
+                std::array::IntoIter::new([
+                    (
+                        "v_old - v_new = magnitude * sign",
+                        v_old.clone() - v_new.clone() - magnitude * sign,
+                    ),
+                    (
+                        "Either v_old = 0, or anchor equals public input",
+                        v_old.clone() * (anchor - pub_input_anchor),
+                    ),
+                    ("v_old = 0 or enable_spends = 1", v_old * not_enable_spends),
+                    (
+                        "v_new = 0 or enable_outputs = 1",
+                        v_new * not_enable_outputs,
+                    ),
+                ]),
+            )
         });
 
         // Addition of two field elements poseidon_hash(nk, rho_old) + psi_old.

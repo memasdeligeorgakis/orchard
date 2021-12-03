@@ -1,3 +1,5 @@
+use std::array;
+
 use super::{
     message::{Message, MessagePiece},
     CommitDomains, HashDomains, SinsemillaInstructions,
@@ -17,8 +19,8 @@ use halo2::{
     arithmetic::CurveAffine,
     circuit::{AssignedCell, Chip, Layouter},
     plonk::{
-        Advice, Column, ConstraintSystem, Error, Expression, Fixed, Selector, TableColumn,
-        VirtualCells,
+        Advice, Column, ConstraintSystem, Constraints, Error, Expression, Fixed, Selector,
+        TableColumn, VirtualCells,
     },
     poly::Rotation,
 };
@@ -225,10 +227,10 @@ impl SinsemillaChip {
                 lhs - rhs
             };
 
-            vec![
-                ("Secant line", q_s1.clone() * secant_line),
-                ("y check", q_s1 * y_check),
-            ]
+            Constraints::with_selector(
+                q_s1,
+                array::IntoIter::new([("Secant line", secant_line), ("y check", y_check)]),
+            )
         });
 
         config
