@@ -28,8 +28,8 @@ blake2b_simd = "1"
 ff = "0.11"
 fpe = "0.5"
 group = "0.11"
-halo2_gadgets = "=0.1.0-beta.3"
-halo2_proofs = "=0.1.0-beta.4"
+halo2_gadgets = { git = "https://github.com/zcash/halo2.git", rev = "0453842c6970d846616ebb116d5f6ca833d0fcd7" }
+halo2_proofs = { git = "https://github.com/zcash/halo2.git", rev = "0453842c6970d846616ebb116d5f6ca833d0fcd7" }
 hex = "0.4"
 lazy_static = "1"
 memuse = { version = "0.2", features = ["nonempty"] }
@@ -48,7 +48,8 @@ plotters = { version = "0.3.0", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
-halo2_gadgets = { version = "=0.1.0-beta.3", features = ["test-dependencies"] }
+halo2_gadgets = { git = "https://github.com/zcash/halo2.git", rev = "0453842c6970d846616ebb116d5f6ca833d0fcd7", features = ["test-dependencies"] }
+hex = "0.4"
 proptest = "1.0.0"
 zcash_note_encryption = { version = "0.1", features = ["pre-zip-212"] }
 
